@@ -1,0 +1,52 @@
+services:
+    final_exam-app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: mifania-app
+        ports:
+            - "8000:8000"
+        volumes:
+            - .:/app
+        environment:
+            APP_ENV: prod
+            DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@final_exam-db:3306/${MYSQL_DATABASE}?serverVersion=8.0.32&charset=utf8mb4
+        depends_on:
+            - final_exam-db
+        networks:
+            - mifania_platform-network
+
+    final_exam-db:
+        image: mysql:8.0
+        container_name: mifania-db
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        ports:
+            - "${MYSQL_PORT}:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+        networks:
+            - mifania_platform-network
+
+    final_exam-phpmyadmin:
+        image: phpmyadmin:latest
+        container_name: mifania-phpmyadmin
+        environment:
+            PMA_HOST: final_exam-db
+            PMA_USER: ${MYSQL_USER}
+            PMA_PASSWORD: ${MYSQL_PASSWORD}
+        ports:
+            - "8080:80"
+        depends_on:
+            - final_exam-db
+        networks:
+            - mifania_platform-network
+
+volumes:
+    mysql_data:
+
+networks:
+    mifania_platform-network:
