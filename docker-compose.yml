@@ -14,17 +14,18 @@ services:
             DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE}?serverVersion=8.0.32&charset=utf8mb4
             APP_ENV: dev
             APP_DEBUG: "1"
+        command: php -S 0.0.0.0:80 -t public
         depends_on:
             db:
                 condition: service_healthy
         networks:
             - platform_final-network
-        healthcheck:
-            test: [ "CMD", "curl", "-f", "http://localhost/" ]
-            interval: 10s
-            timeout: 5s
-            retries: 3
-            start_period: 10s
+        # healthcheck:
+        #     test: [ "CMD", "curl", "-f", "http://localhost/" ]
+        #     interval: 10s
+        #     timeout: 5s
+        #     retries: 3
+        #     start_period: 10s
 
     db:
         image: mysql:8.0.32

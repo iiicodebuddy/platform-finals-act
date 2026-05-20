@@ -45,16 +45,16 @@ RUN mkdir -p /app/var && \
     chmod -R 755 /app && \
     chmod -R 775 /app/var
 
-COPY nginx-main.conf /etc/nginx/nginx.conf
-RUN rm -rf /etc/nginx/conf.d/* /etc/nginx/sites-enabled /etc/nginx/sites
-COPY nginx.conf /etc/nginx/conf.d/symfony.conf
+# COPY nginx-main.conf /etc/nginx/nginx.conf
+# RUN rm -rf /etc/nginx/conf.d/* /etc/nginx/sites-enabled /etc/nginx/sites
+# COPY nginx.conf /etc/nginx/conf.d/symfony.conf
 
-COPY entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# COPY entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+# RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost/ || exit 1
+# HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
+#     CMD curl -f http://localhost/ || exit 1
 
 EXPOSE 80
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+# ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
