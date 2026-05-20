@@ -1,23 +1,56 @@
 services:
-    final_exam-app:
+    app:
         build:
             context: .
             dockerfile: Dockerfile
-        container_name: final_exam-app
+        container_name: platform_final-app
         ports:
-            - "8000:8000"
+            - "8000:80"
         volumes:
             - .:/app
         environment:
-            APP_ENV: prod
-            DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@final_exam-db:3306/${MYSQL_DATABASE}?serverVersion=8.0.32&charset=utf8mb4
+            DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE}?serverVersion=8.0.32&charset=utf8mb4
+            APP_ENV: dev
+            APP_DEBUG: "1"
+        command: bash -c "rm -rf var/cache/* && php bin/console cache:clear && php -S 0.0.0.0:80 -t public"
         depends_on:
-            - final_exam-db
+            db:
+                condition: service_healthy
         networks:
-            - mifania_platform-network
+            - platform_final-network
+        # healthcheck:
+        #     test: [ "CMD", "curl", "-f", "http://localhost/" ]
+        #     interval: 10s
+        #     timeout: 5s
+        #     retries: 3
+        #     start_period: 10s
 
-volumes:
-    mysql_data:
+    db:
+        image: mysql:8.0.32
+        container_name: platform_final-db
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        ports:
+            - "${MYSQL_PORT}:3306"
+        volumes:
+            - db_data:/var/lib/mysql
+        networks:
+            - platform_final-network
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+
+
 
 networks:
-    mifania_platform-network:
+    platform_final-network:
+        driver: bridge
+
+volumes:
+    db_data:
