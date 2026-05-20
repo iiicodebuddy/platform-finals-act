@@ -26,7 +26,7 @@ RUN if [ ! -f .env ]; then echo "APP_ENV=prod\nAPP_DEBUG=false\nAPP_SECRET=SomeR
 RUN composer install --no-interaction --optimize-autoloader --no-ansi || true
 RUN php bin/console importmap:install --no-interaction
 
-RUN php bin/console cache:warmup --env=prod --no-debug || true
+# RUN php bin/console cache:warmup --env=prod --no-debug || true
 
 FROM php:8.4-fpm AS runtime
 

@@ -12,7 +12,7 @@ services:
             DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE}?serverVersion=8.0.32&charset=utf8mb4
             APP_ENV: dev
             APP_DEBUG: "1"
-        command: php -S 0.0.0.0:80 -t public
+        command: bash -c "rm -rf var/cache/* && php bin/console cache:clear && php -S 0.0.0.0:80 -t public"
         depends_on:
             db:
                 condition: service_healthy
