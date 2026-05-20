@@ -2,6 +2,10 @@ FROM php:8.4-fpm AS builder
 
 WORKDIR /app
 
+# Set the working directory for all following commands.
+WORKDIR /app
+
+# Install required tools for Composer, Git, and frontend build assets.
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -11,7 +15,8 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_mysql \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install Composer globally so Composer commands are available.
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
@@ -19,6 +24,13 @@ COPY composer.json composer.lock ./
 
 RUN composer install --no-interaction --no-scripts --optimize-autoloader
 
+# Copy dependency manifests first to leverage Docker caching.
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies without executing project scripts yet.
+RUN composer install --no-interaction --no-scripts --optimize-autoloader
+
+# Copy the application source after dependencies are cached.
 COPY . .
 
 RUN if [ ! -f .env ]; then echo "APP_ENV=prod\nAPP_DEBUG=false\nAPP_SECRET=SomeRandomString" > .env; fi
